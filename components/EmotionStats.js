@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip } from 'recharts';
 import html2canvas from 'html2canvas';
@@ -26,7 +25,7 @@ const EmotionStats = ({ diaries }) => {
     return acc;
   }, {});
 
-  const data = Object.entries(stats).map(([name, value], i) => ({
+  const data = Object.entries(stats).map(([name, value]) => ({
     name,
     value,
     emoji: Object.entries(emotionLabels).find(([, label]) => label === name)?.[0] || "❓"
@@ -88,7 +87,10 @@ const EmotionStats = ({ diaries }) => {
               <tbody>
                 {data.map(({ name, value, emoji }) => (
                   <tr key={name}>
-                    <td>{emoji} {name}</td>
+                    <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span>{emoji}</span>
+                      <span>{name}</span>
+                    </td>
                     <td style={{ textAlign: 'right' }}>{value}</td>
                   </tr>
                 ))}
