@@ -9,6 +9,8 @@ const DiaryForm = ({ onAdd, editingDiary }) => {
   const [recommendation, setRecommendation] = useState('');
   const [lbtiResult, setLbtiResult] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [analyzeUsed, setAnalyzeUsed] = useState(false);
+  const [lbtiUsed, setLbtiUsed] = useState(false);
 
   useEffect(() => {
     if (editingDiary) {
@@ -18,29 +20,13 @@ const DiaryForm = ({ onAdd, editingDiary }) => {
       setText('');
       setEmotion('기쁨');
     }
+    setAnalyzeUsed(false);
+    setLbtiUsed(false);
   }, [editingDiary]);
 
-  
-const MAX_DAILY_USAGE = 2;
-
-const getUsageCount = (key) => {
-  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-  const usage = JSON.parse(localStorage.getItem(key)) || {};
-  return usage[today] || 0;
-};
-
-const incrementUsageCount = (key) => {
-  const today = new Date().toISOString().slice(0, 10);
-  const usage = JSON.parse(localStorage.getItem(key)) || {};
-  usage[today] = (usage[today] || 0) + 1;
-  localStorage.setItem(key, JSON.stringify(usage));
-};
-
-
   const handleAnalyze = async () => {
-    const count = getUsageCount('analyzeUsage');
-    if (count >= MAX_DAILY_USAGE) {
-      alert('오늘은 감정 추천을 더 이상 이용할 수 없습니다. 내일 다시 시도해 주세요.');
+    if (analyzeUsed) {
+      alert('이 일기에 대해 감정 추천은 이미 사용했습니다.');
       return;
     }
 
@@ -48,7 +34,7 @@ const incrementUsageCount = (key) => {
     try {
       const response = await axios.post('/api/emotion', { text });
       setEmotion(response.data.emotion);
-      incrementUsageCount('analyzeUsage');
+      setAnalyzeUsed(true);
     } catch (error) {
       console.error('감정 분석 오류:', error.message);
     } finally {
@@ -57,9 +43,8 @@ const incrementUsageCount = (key) => {
   };
 
   const handleLbti = async () => {
-    const count = getUsageCount('lbtiUsage');
-    if (count >= MAX_DAILY_USAGE) {
-      alert('오늘은 생활유형지수 분석을 더 이상 이용할 수 없습니다. 내일 다시 시도해 주세요.');
+    if (lbtiUsed) {
+      alert('이 일기에 대해 생활유형지수 분석은 이미 사용했습니다.');
       return;
     }
 
@@ -68,7 +53,7 @@ const incrementUsageCount = (key) => {
       const response = await axios.post('/api/lbti', { text });
       setLbtiResult(response.data);
       setShowPopup(true);
-      incrementUsageCount('lbtiUsage');
+      setLbtiUsed(true);
     } catch (error) {
       console.error('LBTI 분석 오류:', error.message);
       alert('분석 실패! 다시 시도해주세요.');
@@ -85,6 +70,8 @@ const incrementUsageCount = (key) => {
     setText('');
     setEmotion('기쁨');
     setRecommendation('');
+    setAnalyzeUsed(false);
+    setLbtiUsed(false);
   };
 
   const emotionMap = {
@@ -117,8 +104,12 @@ const incrementUsageCount = (key) => {
         </select>
       </div>
       <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-        <button type="button" onClick={handleAnalyze} disabled={loading}>🧠 감정 추천</button>
-        <button type="button" onClick={handleLbti} disabled={loading}>🌈 생활유형지수 분석</button>
+        <button type="button" onClick={handleAnalyze} disabled={loading || analyzeUsed}>
+          🧠 감정 추천
+        </button>
+        <button type="button" onClick={handleLbti} disabled={loading || lbtiUsed}>
+          🌈 생활유형지수 분석
+        </button>
         <button type="submit">✍️ 저장</button>
       </div>
 
