@@ -80,7 +80,9 @@ const EmotionStats = ({ diaries }) => {
             <table style={{ borderCollapse: 'collapse', width: '200px' }}>
               <thead>
                 <tr>
-                  <th style={{ borderBottom: '1px solid #ccc', textAlign: 'left' }}>감정</th>
+                  <th style={{ borderBottom: '1px solid #ccc', textAlign: 'left', paddingLeft: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>감정</div>
+                  </th>
                   <th style={{ borderBottom: '1px solid #ccc', textAlign: 'right' }}>횟수</th>
                 </tr>
               </thead>
