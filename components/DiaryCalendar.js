@@ -13,7 +13,12 @@ const DiaryCalendar = ({ diaries }) => {
   const emotionMap = diaries.reduce((map, diary) => {
     const dateKey = new Date(diary.date).toDateString();
     const emoji = Object.keys(emotionLabels).find(e => diary.emotion === e || emotionLabels[e] === diary.emotion) || "❓";
-    if (!map[dateKey]) map[dateKey] = emoji; // 하나만 저장
+
+    if (!map[dateKey]) map[dateKey] = [];
+    if (!map[dateKey].includes(emoji) && map[dateKey].length < 3) {
+      map[dateKey].push(emoji);
+    }
+
     return map;
   }, {});
 
