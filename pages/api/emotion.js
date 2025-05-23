@@ -1,5 +1,3 @@
-
-// pages/api/emotion.js
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
@@ -28,8 +26,10 @@ export default async function handler(req, res) {
         messages: [
           {
             role: "system",
-            content: `다음 문장의 감정을 아래 목록 중 하나로 분류하고, 감정 이름만 정확히 한 단어로 반환하세요. 다른 감정은 말해주지 마세요.
-가능한 감정 목록: 기쁨, 슬픔, 화남, 불안, 사랑, 자신감, 눈물, 피곤함, 당황, 혐오, 설렘, 불편함, 혼란, 평온함, 고민중, 위로, 무감정, 격노, 열망`,
+            content: `다음 문장의 감정을 아래 목록 중 가장 가까운 하나의 감정 이름만 한 단어로 정확히 반환하세요. 
+- 반드시 아래 감정 목록 중 하나만 출력하세요.
+- 감정 이름 외에 어떤 설명이나 단어도 절대 포함하지 마세요.
+가능한 감정 목록: 기쁨, 슬픔, 화남, 불안, 사랑, 자신감, 눈물, 피곤함, 당황, 혐오, 설렘, 불편함, 혼란, 평온함, 고민중, 위로, 무감정, 격노, 열망`
           },
           {
             role: "user",
@@ -41,11 +41,14 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    const emotion = data.choices?.[0]?.message?.content?.trim();
+    let rawEmotion = data.choices?.[0]?.message?.content?.trim();
 
-    if (!emotion) {
+    if (!rawEmotion) {
       return res.status(500).json({ message: '감정 분석 결과를 가져올 수 없습니다.' });
     }
+
+    // 응답에서 첫 단어만 추출하여 감정 하나로 고정
+    const emotion = rawEmotion.split(/[ ,.\n]/)[0];
 
     return res.status(200).json({ emotion });
   } catch (error) {
