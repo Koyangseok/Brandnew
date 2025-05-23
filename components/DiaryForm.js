@@ -12,10 +12,23 @@ const DiaryForm = ({ onAdd, editingDiary }) => {
   const [analyzeUsed, setAnalyzeUsed] = useState(false);
   const [lbtiUsed, setLbtiUsed] = useState(false);
 
+  const emotionMap = {
+    "기쁨": "😊", "슬픔": "😢", "화남": "😠", "불안": "😨",
+    "사랑": "❤️", "자신감": "😎", "눈물": "😭", "피곤함": "😴",
+    "당황": "😳", "혐오": "🤢", "설렘": "😍", "불편함": "😬",
+    "혼란": "🤯", "평온함": "😇", "고민중": "🤔", "위로": "🤗",
+    "무감정": "😶", "격노": "🤬", "열망": "🔥", "기타": "❓"
+  };
+
+  const emotionList = Object.keys(emotionMap);
+
   useEffect(() => {
     if (editingDiary) {
+      const validEmotion = emotionList.includes(editingDiary.emotion)
+        ? editingDiary.emotion
+        : '기타';
       setText(editingDiary.text);
-      setEmotion(editingDiary.emotion);
+      setEmotion(validEmotion);
     } else {
       setText('');
       setEmotion('기쁨');
@@ -33,10 +46,15 @@ const DiaryForm = ({ onAdd, editingDiary }) => {
     setLoading(true);
     try {
       const response = await axios.post('/api/emotion', { text });
-      setEmotion(response.data.emotion);
+      let apiEmotion = response.data.emotion?.trim();
+      if (!emotionList.includes(apiEmotion)) {
+        apiEmotion = '기타';
+      }
+      setEmotion(apiEmotion);
       setAnalyzeUsed(true);
     } catch (error) {
       console.error('감정 분석 오류:', error.message);
+      setEmotion('기타');
     } finally {
       setLoading(false);
     }
@@ -74,14 +92,6 @@ const DiaryForm = ({ onAdd, editingDiary }) => {
     setLbtiUsed(false);
   };
 
-  const emotionMap = {
-    "기쁨": "😊", "슬픔": "😢", "화남": "😠", "불안": "😨",
-    "사랑": "❤️", "자신감": "😎", "눈물": "😭", "피곤함": "😴",
-    "당황": "😳", "혐오": "🤢", "설렘": "😍", "불편함": "😬",
-    "혼란": "🤯", "평온함": "😇", "고민중": "🤔", "위로": "🤗",
-    "무감정": "😶", "격노": "🤬", "열망": "🔥"
-  };
-
   return (
     <form onSubmit={handleSubmit}>
       <h2>오늘의 마음을 적어보세요</h2>
@@ -96,9 +106,9 @@ const DiaryForm = ({ onAdd, editingDiary }) => {
       <div>
         <label>감정 선택: </label>
         <select value={emotion} onChange={(e) => setEmotion(e.target.value)} required>
-          {Object.entries(emotionMap).map(([label, emoji]) => (
+          {emotionList.map((label) => (
             <option key={label} value={label}>
-              {label} {emoji}
+              {label} {emotionMap[label]}
             </option>
           ))}
         </select>
