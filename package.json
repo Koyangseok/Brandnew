@@ -12,6 +12,7 @@
     "html2canvas": "^1.4.1",
     "idb": "^8.0.3",
     "next": "latest",
+    "openai": "^4.103.0",
     "react": "latest",
     "react-calendar": "^5.1.0",
     "react-dom": "latest",
