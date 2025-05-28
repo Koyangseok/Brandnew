@@ -6,7 +6,6 @@ const DiaryForm = ({ onAdd, editingDiary }) => {
   const [text, setText] = useState('');
   const [emotion, setEmotion] = useState('기쁨');
   const [loading, setLoading] = useState(false);
-  const [recommendation, setRecommendation] = useState('');
   const [lbtiResult, setLbtiResult] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [analyzeUsed, setAnalyzeUsed] = useState(false);
@@ -17,16 +16,14 @@ const DiaryForm = ({ onAdd, editingDiary }) => {
     "사랑": "❤️", "자신감": "😎", "눈물": "😭", "피곤함": "😴",
     "당황": "😳", "혐오": "🤢", "설렘": "😍", "불편함": "😬",
     "혼란": "🤯", "평온함": "😇", "고민중": "🤔", "위로": "🤗",
-    "무감정": "😶", "격노": "🤬", "열망": "🔥", "스트레스": "💢" , "기타": "❔"
+    "무감정": "😶", "격노": "🤬", "열망": "🔥", "스트레스": "💢", "기타": "❔"
   };
 
   const emotionList = Object.keys(emotionMap);
 
   useEffect(() => {
     if (editingDiary) {
-      const validEmotion = emotionList.includes(editingDiary.emotion)
-        ? editingDiary.emotion
-        : '기타';
+      const validEmotion = emotionList.includes(editingDiary.emotion) ? editingDiary.emotion : '기타';
       setText(editingDiary.text);
       setEmotion(validEmotion);
     } else {
@@ -84,10 +81,22 @@ const DiaryForm = ({ onAdd, editingDiary }) => {
     e.preventDefault();
     if (!text || !emotion) return;
 
-    onAdd({ text, emotion });
+    const today = new Date().toDateString();
+    const stored = JSON.parse(localStorage.getItem("diaryUsage") || "{}");
+
+    if (stored.date === today && stored.count >= 2) {
+      alert("오늘은 두 번만 마음을 적을 수 있어요!");
+      return;
+    }
+
+    onAdd({ id: editingDiary?.id, text, emotion });
+
+    // 작성 횟수 1 증가
+    const newCount = (stored.date === today ? stored.count : 0) + 1;
+    localStorage.setItem("diaryUsage", JSON.stringify({ date: today, count: newCount }));
+
     setText('');
     setEmotion('기쁨');
-    setRecommendation('');
     setAnalyzeUsed(false);
     setLbtiUsed(false);
   };
@@ -120,7 +129,7 @@ const DiaryForm = ({ onAdd, editingDiary }) => {
         <button type="button" onClick={handleLbti} disabled={loading || lbtiUsed}>
           🌈 생활유형지수 분석
         </button>
-        <button type="submit">✍️ 저장</button>
+        <button type="submit">✍️ {editingDiary ? '수정하기' : '저장'}</button>
       </div>
 
       {showPopup && lbtiResult && (

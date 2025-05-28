@@ -88,27 +88,36 @@ const Chatbot = () => {
 export default function Home() {
   const [diaries, setDiaries] = useState([]);
   const [view, setView] = useState('diary');
+  const [editingDiary, setEditingDiary] = useState(null);  // ⭐ 수정 중인 일기 상태
 
   useEffect(() => {
     getAllDiaries().then(setDiaries);
   }, []);
 
   const handleAdd = async (diary) => {
-    await addDiary({ ...diary, date: new Date().toISOString() });
+    if (!diary.id) {
+      diary.id = Date.now(); // ⭐️ 새로 작성시 id 생성
+      await addDiary({ ...diary, date: new Date().toISOString() });
+    } else {
+      await updateDiary(diary);
+    }
     const updated = await getAllDiaries();
     setDiaries(updated);
+    setEditingDiary(null);
   };
 
-  const handleEdit = async (id, newText) => {
-    const updatedDiaries = diaries.map(d => d.id === id ? { ...d, text: newText } : d);
-    await updateDiary(updatedDiaries.find(d => d.id === id));
-    setDiaries(updatedDiaries);
+  const handleEdit = (diary) => {
+    setEditingDiary(diary);  // ⭐ 수정할 일기 정보를 DiaryForm에 넘김
   };
 
   const handleDelete = async (id) => {
     await deleteDiary(id);
     const updated = await getAllDiaries();
     setDiaries(updated);
+    // ⭐ 삭제된 항목이 수정 중이었으면 초기화
+    if (editingDiary && editingDiary.id === id) {
+      setEditingDiary(null);
+    }
   };
 
   return (
@@ -158,7 +167,7 @@ export default function Home() {
       {view === 'diary' && (
         <>
           <div style={{ width: '100%', maxWidth: '800px' }}>
-            <DiaryForm onAdd={handleAdd} />
+            <DiaryForm onAdd={handleAdd} editingDiary={editingDiary} />
           </div>
           <div style={{
             display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: '2rem',
