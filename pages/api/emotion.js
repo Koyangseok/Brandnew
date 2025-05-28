@@ -26,7 +26,7 @@ export default async function handler(req, res) {
         messages: [
           {
             role: "system",
-            content: content: `다음 문장의 감정을 아래 목록 중 **가장 가까운 하나만** 골라서 **정확히 아래 단어 중 하나만 반환하세요.**
+            content: `다음 문장의 감정을 아래 목록 중 **가장 가까운 하나만** 골라서 **정확히 아래 단어 중 하나만 반환하세요.**
 다른 설명이나 단어는 절대 포함하지 마세요. 목록 외 감정은 말하지 마세요.
 
 가능한 감정 목록:
