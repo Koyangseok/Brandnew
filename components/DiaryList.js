@@ -38,7 +38,7 @@ const DiaryList = ({ diaries, onEdit, onDelete }) => {
         {diaries.length === 0 ? (
           <p>일기가 없습니다.</p>
         ) : (
-          diaries.map((diary) => (
+          diaries.slice().reverse().map((diary) => (
             <div key={diary.id} id={`diary-${diary.id}`} style={{
               backgroundColor: '#e6f2ff',
               borderRadius: '12px',
