@@ -68,39 +68,78 @@ const EmotionStats = ({ diaries }) => {
               </Pie>
               <Tooltip />
             </PieChart>
-            <button onClick={handleDownload} style={{
-              marginTop: '1rem', padding: '0.4rem 1rem', backgroundColor: '#4caf50',
-              color: 'white', border: 'none', borderRadius: '10px', cursor: 'pointer'
-            }}>
+            <button
+              onClick={handleDownload}
+              style={{
+                marginTop: '1rem',
+                padding: '0.4rem 1rem',
+                backgroundColor: '#4caf50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '10px',
+                cursor: 'pointer'
+              }}
+            >
               📷 이미지로 저장
             </button>
           </div>
-          <div>
+          <div style={{ flex: 1, minWidth: '200px' }}>
             <h4>감정별 횟수</h4>
-            <table style={{ borderCollapse: 'collapse', width: '200px' }}>
-              <thead>
-                <tr>
-                  <th style={{ borderBottom: '1px solid #ccc', textAlign: 'left', paddingLeft: '6px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>감정</div>
-                  </th>
-                  <th style={{ borderBottom: '1px solid #ccc', textAlign: 'right' }}>횟수</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.map(({ name, value, emoji }) => (
-                  <tr key={name}>
-                    <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span>{emoji}</span>
-                      <span>{name}</span>
-                    </td>
-                    <td style={{ textAlign: 'right' }}>{value}</td>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center', // ✅ 테이블을 스마트폰에서도 가운데 정렬
+              width: '100%',
+              overflowX: 'auto'
+            }}>
+              <table style={{ borderCollapse: 'collapse', minWidth: '200px' }}>
+                <thead>
+                  <tr>
+                    <th style={{
+                      borderBottom: '1px solid #ccc',
+                      textAlign: 'left', // 데스크탑에선 왼쪽 정렬
+                      paddingLeft: '6px'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>감정</div>
+                    </th>
+                    <th style={{
+                      borderBottom: '1px solid #ccc',
+                      textAlign: 'right'
+                    }}>
+                      횟수
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {data.map(({ name, value, emoji }) => (
+                    <tr key={name}>
+                      <td style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}>
+                        <span>{emoji}</span>
+                        <span>{name}</span>
+                      </td>
+                      <td style={{ textAlign: 'right' }}>{value}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
+      {/* 💡 모바일 환경에서의 스타일 보완 */}
+      <style jsx global>{`
+        @media (max-width: 600px) {
+          table {
+            width: auto;
+          }
+          table th, table td {
+            text-align: center !important; /* 모바일에서는 가운데 정렬 */
+          }
+        }
+      `}</style>
     </div>
   );
 };
